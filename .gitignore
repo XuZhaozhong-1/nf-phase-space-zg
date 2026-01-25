@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Outputs / runtime
+results/
+param.log
+
+# MadGraph cards (local only)
+local_cards/
+
+# Model checkpoints
+nfmodel/models/
+*.pt
+*.pth
+
+# Binary / compiled
+*.so
+*.dylib
+*.o
+*.a
+
+# Jupyter
+.ipynb_checkpoints/
