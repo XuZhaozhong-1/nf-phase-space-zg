@@ -5,7 +5,7 @@ import torch.nn as nn
 
 LOG_2PI = math.log(2.0 * math.pi)
 
-def standard_normal_logprob(z: torch.Tensor) -> torch.Tensor:
+def standard_normal_logprob(z: torch.Tensor):
     # z: (B, D)
     return (-0.5 * (z**2 + LOG_2PI)).sum(dim=-1)
 
@@ -25,10 +25,10 @@ class MLP(nn.Module):
 class Permute(nn.Module):
     """
     Fixed permutation of dimensions. Invertible with zero logdet.
+    
     """
     def __init__(self, perm: torch.Tensor):
         super().__init__()
-        # perm: (D,) LongTensor, a permutation of [0..D-1]
         assert perm.ndim == 1
         self.register_buffer("perm", perm.long())
         inv = torch.empty_like(self.perm)
@@ -94,13 +94,13 @@ class RealNVP(nn.Module):
         dim: int,
         n_blocks: int = 8,
         hidden: int = 128,
-        permute: str = "reverse",  # "reverse" or "random"
+        permute: str = "reverse",  
         seed: int = 0,
     ):
         super().__init__()
         self.dim = dim
 
-        # Build a list of invertible transforms: [Coupling, Permute, Coupling, Permute, ...]
+        # [Coupling, Permute, Coupling, Permute, ...]
         transforms = []
 
         g = torch.Generator()
@@ -113,7 +113,6 @@ class RealNVP(nn.Module):
 
             transforms.append(AffineCoupling(dim=dim, mask=mask, hidden=hidden))
 
-            # Add permutation after each coupling (except maybe the last; harmless either way)
             if permute == "reverse":
                 perm = torch.arange(dim - 1, -1, -1)
             elif permute == "random":
@@ -145,7 +144,7 @@ class RealNVP(nn.Module):
         z, logdet = self.inv(x)
         return standard_normal_logprob(z) + logdet
 
-    def sample(self, n: int, device="cpu"):
+    def sample(self, n: int, device="mps" if torch.backends.mps.is_available() else "cpu"):
         z = torch.randn(n, self.dim, device=device)
         x, _ = self.fwd(z)
         return x

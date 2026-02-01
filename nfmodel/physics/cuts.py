@@ -53,7 +53,7 @@ def passes_cuts(p_all):
     if abs(eta(g)) > 5.0:
         return False
 
-    # optional: Z pT / eta cuts (often not required, but can be used)
+    # optional: Z pT / eta cuts
     # if pT(Z) < 0.0: return False
     # if abs(eta(Z)) > 10.0: return False
 
