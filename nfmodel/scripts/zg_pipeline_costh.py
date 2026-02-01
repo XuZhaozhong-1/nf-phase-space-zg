@@ -24,7 +24,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 # Utils
 # -----------------------
 def pick_device():
-    return "mps" if torch.backends.mps.is_available() else "cpu"
+    # return "mps" if torch.backends.mps.is_available() else "cpu"
+    return "cpu"
 
 
 def sample_uniform_costh(n, rng):
@@ -63,10 +64,10 @@ def compute_weights_costh_batch(costh_t, Ecm: float, mZ: float):
 def train_flow_costh(
     Ecm=1000.0,
     mZ=MZ_DEFAULT,
-    steps=1000,
-    batch_size=2024,
+    steps=2500,
+    batch_size=10000,
     lr=2e-4,
-    n_blocks=8,         # 8 blocks => 16 layers total (coupling + perm)
+    n_blocks=16,         # 8 blocks => 16 layers total (coupling + perm)
     hidden=16,
     permute="reverse",
     seed=0,
@@ -105,7 +106,7 @@ def train_flow_costh(
         losses.append(lval)
         best = min(best, lval)
 
-        if step % 10 == 0:
+        if step % 100 == 0:
             frac = float((w > 0).float().mean().item())
             print(f"[train] step {step:5d}  loss {lval:.6f}  best {best:.6f}  w_nonzero {frac:.3f}")
 
@@ -359,10 +360,10 @@ def main():
 
     # Train settings
     steps = 2500
-    batch_size = 5024
+    batch_size = 200000
     lr = 2e-4
     hidden = 16
-    n_blocks = 8          # => 16 layers total (coupling + perm)
+    n_blocks = 16         # => 16 layers total (coupling + perm)
     permute = "reverse"
 
     # Eval settings
